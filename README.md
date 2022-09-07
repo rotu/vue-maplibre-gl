@@ -10,17 +10,17 @@ Size: [36 KB](https://bundlephobia.com/package/vue-maplibre-gl)
 
 ## Features
 
-- Typescript support
-- Components for map, controls, sources, marker and layers
-- Support for custom controls
-- Customizable style switch which reloads sources and layers automatically
-- Frame rate control included
-- Support for multiple instances and global access by `useMap(key: string | symbol)`
+-   Typescript support
+-   Components for map, controls, sources, marker and layers
+-   Support for custom controls
+-   Customizable style switch which reloads sources and layers automatically
+-   Frame rate control included
+-   Support for multiple instances and global access by `useMap(key: string | symbol)`
 
 ## Table of contents
 
-- [Installation](#installation)
-- [Usage](#usage)
+-   [Installation](#installation)
+-   [Usage](#usage)
 
 # Installation
 
@@ -33,9 +33,9 @@ yarn add vue-maplibre-gl maplibre-gl
 Global Install:
 
 ```typescript
-import VueMaplibreGl from 'vue-maplibre-gl'
+import VueMaplibreGl from 'vue-maplibre-gl';
 
-app.use(VueMaplibreGl)
+app.use(VueMaplibreGl);
 ```
 
 Add CSS:
@@ -47,24 +47,23 @@ Add CSS:
 Use specific components:
 
 ```typescript
-import { MglMap } from 'vue-maplibre-gl'
+import { MglMap } from 'vue-maplibre-gl';
 
-app.component('MglMap', MglMap)
+app.component('MglMap', MglMap);
 ```
 
 or in a parent components `.vue` file
 
 ```html
-
 <script>
-	import { MglMap } from 'vue-maplibre-gl'
+	import { MglMap } from 'vue-maplibre-gl';
 
 	export default {
 		components: {
-			MglMap
+			MglMap,
 		},
 		// ...
-	}
+	};
 </script>
 ```
 
@@ -87,14 +86,14 @@ If you have ideas, improvements, suggestions etc. don't hesitate to open a pull 
 
 ### Todos
 
-- [ ] Generate separate css file to be included (currently, you have to use scss)
-- [ ] Usage examples
-- [ ] Demo
-- [ ] API documentation
-- [ ] Support `v-model:...` for some basic props
-- [x] Add layer events
-- [ ] Add [Web-types](https://github.com/JetBrains/web-types)
-- [x] Add [frame rate control](https://github.com/mapbox/mapbox-gl-framerate)
+-   [ ] Generate separate css file to be included (currently, you have to use scss)
+-   [ ] Usage examples
+-   [ ] Demo
+-   [ ] API documentation
+-   [ ] Support `v-model:...` for some basic props
+-   [x] Add layer events
+-   [ ] Add [Web-types](https://github.com/JetBrains/web-types)
+-   [x] Add [frame rate control](https://github.com/mapbox/mapbox-gl-framerate)
 
 ## License
 

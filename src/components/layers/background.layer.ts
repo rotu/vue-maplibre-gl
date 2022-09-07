@@ -5,14 +5,13 @@ import { componentIdSymbol, isLoadedSymbol, mapSymbol, sourceIdSymbol, sourceLay
 import { getSourceRef } from '@/components/sources/shared';
 
 export default defineComponent({
-	name  : 'MglBackgroundLayer',
-	mixins: [ Shared ],
-	props : {
+	name: 'MglBackgroundLayer',
+	mixins: [Shared],
+	props: {
 		layout: Object as PropType<BackgroundLayout>,
-		paint : Object as PropType<BackgroundPaint>
+		paint: Object as PropType<BackgroundPaint>,
 	},
 	setup(props) {
-
 		const sourceId = inject(sourceIdSymbol);
 
 		if (!sourceId && !props.source) {
@@ -20,17 +19,21 @@ export default defineComponent({
 			return;
 		}
 
-		const map       = inject(mapSymbol)!,
-			  isLoaded  = inject(isLoadedSymbol)!,
-			  cid       = inject(componentIdSymbol)!,
-			  registry  = inject(sourceLayerRegistry)!,
-			  sourceRef = getSourceRef(cid, props.source || sourceId);
+		const map = inject(mapSymbol)!,
+			isLoaded = inject(isLoadedSymbol)!,
+			cid = inject(componentIdSymbol)!,
+			registry = inject(sourceLayerRegistry)!,
+			sourceRef = getSourceRef(cid, props.source || sourceId);
 
-		watch([ isLoaded, sourceRef ], ([ il, src ]) => {
-			if (il && (src || src === undefined)) {
-				map.value.addLayer(genLayerOpts<BackgroundLayer>(props.layerId, 'background', props, sourceId), props.before || undefined);
-			}
-		}, { immediate: true });
+		watch(
+			[isLoaded, sourceRef],
+			([il, src]) => {
+				if (il && (src || src === undefined)) {
+					map.value.addLayer(genLayerOpts<BackgroundLayer>(props.layerId, 'background', props, sourceId), props.before || undefined);
+				}
+			},
+			{ immediate: true },
+		);
 
 		function removeLayer() {
 			if (isLoaded.value) {
@@ -42,9 +45,8 @@ export default defineComponent({
 		onBeforeUnmount(() => {
 			removeLayer();
 		});
-
 	},
 	render() {
 		return createCommentVNode('Background Layer');
-	}
+	},
 });

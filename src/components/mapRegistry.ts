@@ -9,8 +9,8 @@ export interface MapInstance {
 	isLoaded: boolean;
 }
 
-const instances  = new Map<symbol | string, MapInstance>(),
-	  defaultKey = Symbol('default');
+const instances = new Map<symbol | string, MapInstance>(),
+	defaultKey = Symbol('default');
 
 // useMap returns reactive version of MapInstance
 export function useMap(key: symbol | string = defaultKey): MapInstance {
@@ -28,11 +28,11 @@ export function registerMap(instance: InstanceType<typeof MglMap>, key: symbol |
 		component = reactive({ isLoaded: false, isMounted: false });
 		instances.set(key, component);
 	}
-	component.isLoaded  = false;
+	component.isLoaded = false;
 	component.isMounted = false;
 	component.component = instance;
-	component.map       = instance.map as maplibregl.Map;
-	component.isLoaded  = (instance.map as maplibregl.Map)?.loaded() || false;
+	component.map = instance.map as maplibregl.Map;
+	component.isLoaded = (instance.map as maplibregl.Map)?.loaded() || false;
 
 	return component;
 }

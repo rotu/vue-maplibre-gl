@@ -13,7 +13,8 @@ import Scss from 'rollup-plugin-scss';
 import analyze from 'rollup-plugin-analyzer';
 
 // Get browserslist config and remove ie from es build targets
-const esbrowserslist = fs.readFileSync('./.browserslistrc')
+const esbrowserslist = fs
+	.readFileSync('./.browserslistrc')
 	.toString()
 	.split('\n')
 	.filter((entry) => entry && entry.substring(0, 2) !== 'ie');
@@ -23,57 +24,54 @@ const argv = minimist(process.argv.slice(2));
 const projectRoot = path.resolve(__dirname, '..');
 
 const baseConfig = {
-	input  : 'src/entry.ts',
+	input: 'src/entry.ts',
 	plugins: {
-		preVue : [
+		preVue: [
 			alias({
 				entries: [
 					{
-						find       : '@',
-						replacement: `${path.resolve(projectRoot, 'src')}`
-					}
-				]
-			})
+						find: '@',
+						replacement: `${path.resolve(projectRoot, 'src')}`,
+					},
+				],
+			}),
 		],
-		vue    : {
-			target           : 'browser',
-			css              : true,
-			preprocessStyles : true,
+		vue: {
+			target: 'browser',
+			css: true,
+			preprocessStyles: true,
 			preprocessOptions: {
 				css: {
-					additionalData: `@import 'src/css/maplibre.scss';`
-				}
-			}
+					additionalData: `@import 'src/css/maplibre.scss';`,
+				},
+			},
 		},
 		postVue: [
 			typescript(),
 			resolve({
-				extensions: [ '.js', '.jsx', '.ts', '.tsx', '.vue', '.scss' ]
+				extensions: ['.js', '.jsx', '.ts', '.tsx', '.vue', '.scss'],
 			}),
 			Scss({
-				output      : "dist/maplibre.css",
-				watch       : 'src/css',
-				includePaths: [
-					path.join(__dirname, '../../node_modules/'),
-					'node_modules/'
-				]
+				output: 'dist/maplibre.css',
+				watch: 'src/css',
+				includePaths: [path.join(__dirname, '../../node_modules/'), 'node_modules/'],
 			}),
 			// Process only `<style module>` blocks.
 			PostCSS({
 				extract: true,
 				modules: {
-					generateScopedName: '[local]___[hash:base64:5]'
+					generateScopedName: '[local]___[hash:base64:5]',
 				},
-				include: /&module=.*\.(css)$/
+				include: /&module=.*\.(css)$/,
 			}),
 			// Process all `<style>` blocks except `<style module>`.
-			PostCSS({include: /(?<!&module=.*)\.css$/}),
-			commonjs()
+			PostCSS({ include: /(?<!&module=.*)\.css$/ }),
+			commonjs(),
 		],
 		analyze: {
-			summaryOnly: true
-		}
-	}
+			summaryOnly: true,
+		},
+	},
 };
 
 // ESM/UMD/IIFE shared settings: externals
@@ -82,7 +80,7 @@ const external = [
 	// list external dependencies, exactly the way it is written in the import statement.
 	// eg. 'jquery'
 	'vue',
-	'maplibre-gl'
+	'maplibre-gl',
 ];
 
 // UMD/IIFE shared settings: output.globals
@@ -90,7 +88,7 @@ const external = [
 const globals = {
 	// Provide global variable names to replace your external imports
 	// eg. jquery: '$'
-	vue: 'Vue'
+	vue: 'Vue',
 };
 
 // Customize configs for individual targets
@@ -98,20 +96,15 @@ const buildFormats = [];
 if (!argv.format || argv.format === 'es') {
 	const esConfig = {
 		...baseConfig,
-		input  : 'src/entry.esm.ts',
+		input: 'src/entry.esm.ts',
 		external,
-		output : {
-			file   : 'dist/vue-maplibre-gl.esm.js',
-			format : 'esm',
+		output: {
+			file: 'dist/vue-maplibre-gl.esm.js',
+			format: 'esm',
 			exports: 'named',
 			sourcemap: true,
 		},
-		plugins: [
-			...baseConfig.plugins.preVue,
-			vue(baseConfig.plugins.vue),
-			...baseConfig.plugins.postVue,
-			analyze(baseConfig.plugins.analyze)
-		]
+		plugins: [...baseConfig.plugins.preVue, vue(baseConfig.plugins.vue), ...baseConfig.plugins.postVue, analyze(baseConfig.plugins.analyze)],
 	};
 	buildFormats.push(esConfig);
 }
@@ -120,21 +113,16 @@ if (!argv.format || argv.format === 'cjs') {
 	const umdConfig = {
 		...baseConfig,
 		external,
-		output : {
+		output: {
 			compact: true,
-			file   : 'dist/vue-maplibre-gl.ssr.js',
-			format : 'cjs',
-			name   : 'VueMaplibreGl',
+			file: 'dist/vue-maplibre-gl.ssr.js',
+			format: 'cjs',
+			name: 'VueMaplibreGl',
 			exports: 'auto',
 			sourcemap: true,
-			globals
+			globals,
 		},
-		plugins: [
-			...baseConfig.plugins.preVue,
-			vue(baseConfig.plugins.vue),
-			...baseConfig.plugins.postVue,
-			analyze(baseConfig.plugins.analyze)
-		]
+		plugins: [...baseConfig.plugins.preVue, vue(baseConfig.plugins.vue), ...baseConfig.plugins.postVue, analyze(baseConfig.plugins.analyze)],
 	};
 	buildFormats.push(umdConfig);
 }
@@ -143,14 +131,14 @@ if (!argv.format || argv.format === 'iife') {
 	const unpkgConfig = {
 		...baseConfig,
 		external,
-		output : {
+		output: {
 			compact: true,
-			file   : 'dist/vue-maplibre-gl.min.js',
-			format : 'iife',
-			name   : 'VueMaplibreGl',
+			file: 'dist/vue-maplibre-gl.min.js',
+			format: 'iife',
+			name: 'VueMaplibreGl',
 			exports: 'auto',
 			sourcemap: true,
-			globals
+			globals,
 		},
 		plugins: [
 			...baseConfig.plugins.preVue,
@@ -158,11 +146,11 @@ if (!argv.format || argv.format === 'iife') {
 			...baseConfig.plugins.postVue,
 			terser({
 				output: {
-					ecma: 5
-				}
+					ecma: 5,
+				},
 			}),
-			analyze(baseConfig.plugins.analyze)
-		]
+			analyze(baseConfig.plugins.analyze),
+		],
 	};
 	buildFormats.push(unpkgConfig);
 }

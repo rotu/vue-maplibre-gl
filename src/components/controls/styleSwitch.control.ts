@@ -10,68 +10,75 @@ function isEvent(e: any): e is Event {
 }
 
 export default defineComponent({
-	name : 'MglStyleSwitchControl',
+	name: 'MglStyleSwitchControl',
 	props: {
-		position  : {
-			type     : String as PropType<PositionValue>,
+		position: {
+			type: String as PropType<PositionValue>,
 			validator: (v: Position) => {
 				return PositionValues.indexOf(v) !== -1;
-			}
+			},
 		},
-		mapStyles : {
-			type    : Array as PropType<StyleSwitchItem[]>,
+		mapStyles: {
+			type: Array as PropType<StyleSwitchItem[]>,
 			required: true,
-			default : []
+			default: [],
 		},
 		modelValue: {
-			type: Object as PropType<StyleSwitchItem>
+			type: Object as PropType<StyleSwitchItem>,
 		},
-		isOpen    : {
-			type   : Boolean as PropType<boolean>,
-			default: undefined
-		}
+		isOpen: {
+			type: Boolean as PropType<boolean>,
+			default: undefined,
+		},
 	},
-	emits: [ 'update:modelValue', 'update:isOpen' ],
+	emits: ['update:modelValue', 'update:isOpen'],
 	setup(props, ctx) {
-
-		const map         = inject(mapSymbol)!,
-			  isMapLoaded = inject(isLoadedSymbol)!,
-			  emitter     = inject(emitterSymbol)!,
-			  isAdded     = ref(false),
-			  isOpen      = ref(props.isOpen === undefined ? false : props.isOpen),
-			  modelValue  = ref(props.modelValue === undefined ? (props.mapStyles.length ? props.mapStyles[ 0 ] : null) : props.modelValue),
-			  control     = new CustomControl(isAdded, false),
-			  closer      = toggleOpen.bind(null, false);
+		const map = inject(mapSymbol)!,
+			isMapLoaded = inject(isLoadedSymbol)!,
+			emitter = inject(emitterSymbol)!,
+			isAdded = ref(false),
+			isOpen = ref(props.isOpen === undefined ? false : props.isOpen),
+			modelValue = ref(props.modelValue === undefined ? (props.mapStyles.length ? props.mapStyles[0] : null) : props.modelValue),
+			control = new CustomControl(isAdded, false),
+			closer = toggleOpen.bind(null, false);
 
 		function setStyleByMap() {
 			const name = map.value.getStyle().name;
 			for (let i = 0, len = props.mapStyles.length; i < len; i++) {
-				if (props.mapStyles[ i ].name === name) {
-					setStyle(props.mapStyles[ i ]);
+				if (props.mapStyles[i].name === name) {
+					setStyle(props.mapStyles[i]);
 					break;
 				}
 			}
 		}
 
-		watch(isMapLoaded, (v) => {
-			if (v) setStyleByMap();
-		}, { immediate: true });
+		watch(
+			isMapLoaded,
+			(v) => {
+				if (v) setStyleByMap();
+			},
+			{ immediate: true },
+		);
 		map.value.on('style.load', setStyleByMap);
 		document.addEventListener('click', closer);
 
-
 		usePositionWatcher(() => props.position, map, control);
 
-
 		if (props.modelValue !== undefined) {
-			watch(() => props.modelValue, v => {
-				if (v !== undefined) modelValue.value = v;
-			});
+			watch(
+				() => props.modelValue,
+				(v) => {
+					if (v !== undefined) modelValue.value = v;
+				},
+			);
 		}
 		if (props.isOpen !== undefined) {
-			watch(() => props.isOpen, v => {
-				if (v !== undefined) isOpen.value = v;
-			});
+			watch(
+				() => props.isOpen,
+				(v) => {
+					if (v !== undefined) isOpen.value = v;
+				},
+			);
 		}
 
 		onBeforeUnmount(() => {
@@ -100,7 +107,7 @@ export default defineComponent({
 			} else if (isEvent(forceIsOpen)) {
 				forceIsOpen.stopPropagation();
 			}
-			if (props.isOpen !== undefined && props.isOpen === forceIsOpen || isOpen.value === forceIsOpen) {
+			if ((props.isOpen !== undefined && props.isOpen === forceIsOpen) || isOpen.value === forceIsOpen) {
 				return;
 			}
 			if (props.isOpen === undefined) {
@@ -112,7 +119,6 @@ export default defineComponent({
 		}
 
 		return { isAdded, container: control.container, setStyle, toggleOpen, intIsOpen: isOpen, intModelValue: modelValue };
-
 	},
 	// just only for code assist
 	template: `
@@ -138,45 +144,53 @@ export default defineComponent({
 			return createCommentVNode('style-switch-control');
 		}
 		const slotProps = {
-			isOpen      : this.intIsOpen,
+			isOpen: this.intIsOpen,
 			currentStyle: this.intModelValue,
-			mapStyles   : this.mapStyles,
-			toggleOpen  : this.toggleOpen,
-			setStyle    : this.setStyle
+			mapStyles: this.mapStyles,
+			toggleOpen: this.toggleOpen,
+			setStyle: this.setStyle,
 		};
 		return h(
 			Teleport as any,
 			{ to: this.container },
 			renderSlot(this.$slots, 'default', slotProps, () => [
-				renderSlot(this.$slots, 'button', slotProps, () => [ h(MglButton, {
-					type   : ButtonType.MDI,
-					path   : mdiLayersOutline,
-					'class': [ 'maplibregl-ctrl-icon maplibregl-style-switch', this.intIsOpen ? 'is-open' : '' ],
-					onClick: this.toggleOpen.bind(null, true)
-				}) ]),
+				renderSlot(this.$slots, 'button', slotProps, () => [
+					h(MglButton, {
+						type: ButtonType.MDI,
+						path: mdiLayersOutline,
+						class: ['maplibregl-ctrl-icon maplibregl-style-switch', this.intIsOpen ? 'is-open' : ''],
+						onClick: this.toggleOpen.bind(null, true),
+					}),
+				]),
 				renderSlot(this.$slots, 'styleList', slotProps, () => [
 					h(
 						'div',
-						{ 'class': [ 'maplibregl-style-list', this.intIsOpen ? 'is-open' : '' ] },
+						{ class: ['maplibregl-style-list', this.intIsOpen ? 'is-open' : ''] },
 						this.mapStyles.map((s) => {
 							return s.icon
-								? h(MglButton, {
-									type   : ButtonType.MDI,
-									path   : s.icon.path,
-									'class': this.intModelValue?.name === s.name ? 'is-active' : '',
-									onClick: () => this.setStyle(s)
-								}, createTextVNode(s.label))
-								: h('button', {
-									type   : 'button',
-									'class': this.intModelValue?.name === s.name ? 'is-active' : '',
-									onClick: () => this.setStyle(s)
-								}, createTextVNode(s.label));
-
-						})
-					)
-				])
-			])
+								? h(
+										MglButton,
+										{
+											type: ButtonType.MDI,
+											path: s.icon.path,
+											class: this.intModelValue?.name === s.name ? 'is-active' : '',
+											onClick: () => this.setStyle(s),
+										},
+										createTextVNode(s.label),
+								  )
+								: h(
+										'button',
+										{
+											type: 'button',
+											class: this.intModelValue?.name === s.name ? 'is-active' : '',
+											onClick: () => this.setStyle(s),
+										},
+										createTextVNode(s.label),
+								  );
+						}),
+					),
+				]),
+			]),
 		);
-	}
+	},
 });
-

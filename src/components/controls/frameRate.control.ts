@@ -4,9 +4,8 @@ import { Position, PositionValue, PositionValues, usePositionWatcher } from '@/c
 import { mapSymbol } from '@/components/types';
 
 export class FrameRateControl implements IControl {
-
-	private frames      = 0;
-	private totalTime   = 0;
+	private frames = 0;
+	private totalTime = 0;
 	private totalFrames = 0;
 
 	private time: number | null = null;
@@ -17,16 +16,17 @@ export class FrameRateControl implements IControl {
 
 	private eventHandlers = new Map<string, Function>();
 
-	constructor(private background  = 'rgba(0,0,0,0.9)',
-				private barWidth    = 4 * window.devicePixelRatio,
-				private color       = '#7cf859',
-				private font        = 'Monaco, Consolas, Courier, monospace',
-				private graphHeight = 60 * window.devicePixelRatio,
-				private graphWidth  = 90 * window.devicePixelRatio,
-				private graphTop    = 0,
-				private graphRight  = 5 * window.devicePixelRatio,
-				private width       = 100 * window.devicePixelRatio) {
-	}
+	constructor(
+		private background = 'rgba(0,0,0,0.9)',
+		private barWidth = 4 * window.devicePixelRatio,
+		private color = '#7cf859',
+		private font = 'Monaco, Consolas, Courier, monospace',
+		private graphHeight = 60 * window.devicePixelRatio,
+		private graphWidth = 90 * window.devicePixelRatio,
+		private graphTop = 0,
+		private graphRight = 5 * window.devicePixelRatio,
+		private width = 100 * window.devicePixelRatio,
+	) {}
 
 	getDefaultPosition(): Position {
 		return Position.TOP_RIGHT;
@@ -35,24 +35,24 @@ export class FrameRateControl implements IControl {
 	onAdd(map: MMap): HTMLElement {
 		this.map = map;
 
-		const el     = (this.container = document.createElement('div'));
+		const el = (this.container = document.createElement('div'));
 		el.className = 'mapboxgl-ctrl mapboxgl-ctrl-fps';
 
 		el.style.backgroundColor = this.background;
-		el.style.borderRadius    = '6px';
+		el.style.borderRadius = '6px';
 
-		this.readOutput                  = document.createElement('div');
-		this.readOutput.style.color      = this.color;
+		this.readOutput = document.createElement('div');
+		this.readOutput.style.color = this.color;
 		this.readOutput.style.fontFamily = this.font;
-		this.readOutput.style.padding    = '0 5px 5px';
-		this.readOutput.style.fontSize   = '9px';
+		this.readOutput.style.padding = '0 5px 5px';
+		this.readOutput.style.fontSize = '9px';
 		this.readOutput.style.fontWeight = 'bold';
-		this.readOutput.textContent      = 'Waiting…';
+		this.readOutput.textContent = 'Waiting…';
 
-		this.canvas               = document.createElement('canvas');
-		this.canvas.className     = 'mapboxgl-ctrl-canvas';
-		this.canvas.width         = this.width;
-		this.canvas.height        = this.graphHeight;
+		this.canvas = document.createElement('canvas');
+		this.canvas.className = 'mapboxgl-ctrl-canvas';
+		this.canvas.width = this.width;
+		this.canvas.height = this.graphHeight;
 		this.canvas.style.cssText = `width: ${this.width / window.devicePixelRatio}px; height: ${this.graphHeight / window.devicePixelRatio}px;`;
 
 		el.appendChild(this.readOutput);
@@ -75,7 +75,7 @@ export class FrameRateControl implements IControl {
 
 	onMoveStart() {
 		this.frames = 0;
-		this.time   = performance.now();
+		this.time = performance.now();
 		this.eventHandlers.set('render', this.onRender.bind(this));
 		this.map!.on('render', this.eventHandlers.get('render') as any);
 	}
@@ -84,7 +84,7 @@ export class FrameRateControl implements IControl {
 		const now = performance.now();
 		this.updateGraph(this.getFPS(now));
 		this.frames = 0;
-		this.time   = null;
+		this.time = null;
 		this.map!.off('render', this.eventHandlers.get('render') as any);
 	}
 
@@ -95,7 +95,7 @@ export class FrameRateControl implements IControl {
 			if (now >= this.time + 1e3) {
 				this.updateGraph(this.getFPS(now));
 				this.frames = 0;
-				this.time   = performance.now();
+				this.time = performance.now();
 			}
 		}
 	}
@@ -108,10 +108,10 @@ export class FrameRateControl implements IControl {
 
 	updateGraph(fpsNow: number) {
 		const context = this.canvas!.getContext('2d')!;
-		const fps     = Math.round((1e3 * this.totalFrames) / this.totalTime) || 0;
-		const rect    = (this.graphHeight, this.barWidth);
+		const fps = Math.round((1e3 * this.totalFrames) / this.totalTime) || 0;
+		const rect = (this.graphHeight, this.barWidth);
 
-		context.fillStyle   = this.background;
+		context.fillStyle = this.background;
 		context.globalAlpha = 1;
 		context.fillRect(0, 0, this.graphWidth, this.graphTop);
 		context.fillStyle = this.color;
@@ -126,89 +126,78 @@ export class FrameRateControl implements IControl {
 			this.graphRight,
 			this.graphTop,
 			this.graphWidth - rect,
-			this.graphHeight
+			this.graphHeight,
 		);
-		context.fillRect(
-			this.graphRight + this.graphWidth - rect,
-			this.graphTop,
-			rect,
-			this.graphHeight
-		);
-		context.fillStyle   = this.background;
+		context.fillRect(this.graphRight + this.graphWidth - rect, this.graphTop, rect, this.graphHeight);
+		context.fillStyle = this.background;
 		context.globalAlpha = 0.75;
-		context.fillRect(
-			this.graphRight + this.graphWidth - rect,
-			this.graphTop,
-			rect,
-			(1 - fpsNow / 100) * this.graphHeight
-		);
+		context.fillRect(this.graphRight + this.graphWidth - rect, this.graphTop, rect, (1 - fpsNow / 100) * this.graphHeight);
 	}
-
 }
 
 export default defineComponent({
-	name : 'MglFrameRateControl',
+	name: 'MglFrameRateControl',
 	props: {
-		position   : {
-			type     : String as PropType<PositionValue>,
+		position: {
+			type: String as PropType<PositionValue>,
 			validator: (v: Position) => {
 				return PositionValues.indexOf(v) !== -1;
-			}
+			},
 		},
-		background : {
-			type   : String as PropType<string>,
-			default: 'rgba(0,0,0,0.9)'
+		background: {
+			type: String as PropType<string>,
+			default: 'rgba(0,0,0,0.9)',
 		},
-		barWidth   : {
-			type   : Number as PropType<number>,
-			default: 4 * window.devicePixelRatio
+		barWidth: {
+			type: Number as PropType<number>,
+			default: 4 * window.devicePixelRatio,
 		},
-		color      : {
-			type   : String as PropType<string>,
-			default: '#7cf859'
+		color: {
+			type: String as PropType<string>,
+			default: '#7cf859',
 		},
-		font       : {
-			type   : String as PropType<string>,
-			default: 'Monaco, Consolas, Courier, monospace'
+		font: {
+			type: String as PropType<string>,
+			default: 'Monaco, Consolas, Courier, monospace',
 		},
 		graphHeight: {
-			type   : Number as PropType<number>,
-			default: 60 * window.devicePixelRatio
+			type: Number as PropType<number>,
+			default: 60 * window.devicePixelRatio,
 		},
-		graphWidth : {
-			type   : Number as PropType<number>,
-			default: 90 * window.devicePixelRatio
+		graphWidth: {
+			type: Number as PropType<number>,
+			default: 90 * window.devicePixelRatio,
 		},
-		graphTop   : {
-			type   : Number as PropType<number>,
-			default: 0
+		graphTop: {
+			type: Number as PropType<number>,
+			default: 0,
 		},
-		graphRight : {
-			type   : Number as PropType<number>,
-			default: 5 * window.devicePixelRatio
+		graphRight: {
+			type: Number as PropType<number>,
+			default: 5 * window.devicePixelRatio,
 		},
-		width      : {
-			type   : Number as PropType<number>,
-			default: 100 * window.devicePixelRatio
-		}
+		width: {
+			type: Number as PropType<number>,
+			default: 100 * window.devicePixelRatio,
+		},
 	},
 	setup(props) {
-		const map     = inject(mapSymbol)!,
-			  control = new FrameRateControl(
-				  props.background,
-				  props.barWidth,
-				  props.color,
-				  props.font,
-				  props.graphHeight,
-				  props.graphWidth,
-				  props.graphTop,
-				  props.graphRight,
-				  props.width
-			  );
+		const map = inject(mapSymbol)!,
+			control = new FrameRateControl(
+				props.background,
+				props.barWidth,
+				props.color,
+				props.font,
+				props.graphHeight,
+				props.graphWidth,
+				props.graphTop,
+				props.graphRight,
+				props.width,
+			);
 		usePositionWatcher(() => props.position, map, control);
 		onBeforeUnmount(() => map.value.removeControl(control));
 	},
 	render() {
 		// nothing
-	}
+	},
 });

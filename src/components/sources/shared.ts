@@ -6,19 +6,22 @@ import { SourceLayerRegistry } from '@/components/sources/sourceLayer.registry';
 
 export function genSourceOpts<T extends object, O extends object>(type: string, props: object, sourceOpts: Array<keyof O>): T {
 	return Object.keys(props)
-				 .filter(opt => (props as any)[ opt ] !== undefined && sourceOpts.indexOf(opt as any) !== -1)
-				 .reduce((obj, opt) => {
-					 (obj as any)[ opt ] = unref((props as any)[ opt ]);
-					 return obj;
-				 }, { type } as T);
+		.filter((opt) => (props as any)[opt] !== undefined && sourceOpts.indexOf(opt as any) !== -1)
+		.reduce(
+			(obj, opt) => {
+				(obj as any)[opt] = unref((props as any)[opt]);
+				return obj;
+			},
+			{ type } as T,
+		);
 }
 
 const refs = new Map<string, Ref<AnySourceImpl | undefined | null>>();
 
 export function getSourceRef<T = AnySourceImpl>(mcid: number, source: any): Ref<T | undefined | null> {
 	const isString = typeof source === 'string',
-		  key      = String(mcid) + (isString ? source : '');
-	let r          = refs.get(key);
+		key = String(mcid) + (isString ? source : '');
+	let r = refs.get(key);
 	if (!r) {
 		r = ref(isString ? null : undefined);
 		refs.set(key, r);
@@ -26,8 +29,16 @@ export function getSourceRef<T = AnySourceImpl>(mcid: number, source: any): Ref<
 	return r as Ref<T | undefined | null>;
 }
 
-export function bindSource<T extends object, O extends object>(map: Ref<GlMap>, source: Ref<AnySourceImpl | undefined | null>, isLoaded: Ref<boolean>, emitter: Emitter<MglEvents>, props: any, type: string, sourceOpts: Array<keyof O>, registry: SourceLayerRegistry) {
-
+export function bindSource<T extends object, O extends object>(
+	map: Ref<GlMap>,
+	source: Ref<AnySourceImpl | undefined | null>,
+	isLoaded: Ref<boolean>,
+	emitter: Emitter<MglEvents>,
+	props: any,
+	type: string,
+	sourceOpts: Array<keyof O>,
+	registry: SourceLayerRegistry,
+) {
 	function addSource() {
 		if (isLoaded.value) {
 			map.value.addSource(props.sourceId, genSourceOpts<T, O>(type, props, sourceOpts) as AnySourceData);
@@ -51,5 +62,4 @@ export function bindSource<T extends object, O extends object>(map: Ref<GlMap>, 
 		map.value.off('style.load', addSource);
 		emitter.off('styleSwitched', resetSource);
 	});
-
 }
