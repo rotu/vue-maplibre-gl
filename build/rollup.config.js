@@ -5,7 +5,6 @@ import vue from 'rollup-plugin-vue';
 import alias from '@rollup/plugin-alias';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
-import PostCSS from 'rollup-plugin-postcss';
 import { terser } from 'rollup-plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 import minimist from 'minimist';
@@ -56,16 +55,6 @@ const baseConfig = {
 				watch: 'src/css',
 				includePaths: [path.join(__dirname, '../../node_modules/'), 'node_modules/'],
 			}),
-			// Process only `<style module>` blocks.
-			PostCSS({
-				extract: true,
-				modules: {
-					generateScopedName: '[local]___[hash:base64:5]',
-				},
-				include: /&module=.*\.(css)$/,
-			}),
-			// Process all `<style>` blocks except `<style module>`.
-			PostCSS({ include: /(?<!&module=.*)\.css$/ }),
 			commonjs(),
 		],
 		analyze: {
